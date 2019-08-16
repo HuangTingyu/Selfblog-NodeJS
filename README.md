@@ -9,7 +9,28 @@ httpReq-test演示了简单的HTTP服务，GET请求，POST请求的发送
 
 blog演示了博客后端接口的编写。
 
+## 启动方式
 
+```
+npm install
+npm run dev
+```
+
+### 端口号(bin\www.js文件)
+
+```
+8000
+```
+
+浏览器输入(localhost:8000进入项目)
+
+## 接口列表
+
+- <http://localhost:8000/api/blog/list> 博客列表
+- http://localhost:8000/api/blog/detail 博客详情
+- http://localhost:8000/api/blog/new 新建博客
+- http://localhost:8000/api/blog/update 更新博客
+- http://localhost:8000/api/blog/del 删除博客
 
 ## 博客后端接口的实现及数据表的设计
 
@@ -21,15 +42,11 @@ blog演示了博客后端接口的编写。
 
 （3）  管理中心，新建页，编辑页
 
- 
-
 ### 技术方案
 
 （1）  数据如何存储
 
 （2）  如何与前端对接，即接口设计
-
- 
 
 ### 数据存储
 
@@ -69,3 +86,7 @@ blog演示了博客后端接口的编写。
 （1）  使用nodemon检测文件变化，自动重启node
 
 （2）  使用cross-env设置环境变量
+
+
+
+### 
