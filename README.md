@@ -18,11 +18,15 @@ npm run dev
 
 ### 端口号(bin\www.js文件)
 
-```
-8000
-```
-
 浏览器输入(localhost:8000进入项目)
+
+浏览器端口号 —— 8000
+
+### mysql数据库
+
+账号 —— root
+
+密码 —— 123
 
 ## 接口列表
 
@@ -71,7 +75,7 @@ npm run dev
 | 删除博客   | del    | post | id             |
 | 登录     | login  | post |                |
 
- 
+
 
 ### 开发接口
 
@@ -88,5 +92,3 @@ npm run dev
 （2）  使用cross-env设置环境变量
 
 
-
-### 
