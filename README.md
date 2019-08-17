@@ -9,7 +9,7 @@ httpReq-test演示了简单的HTTP服务，GET请求，POST请求的发送
 
 blog演示了博客后端接口的编写。
 
-## 启动方式
+## blog启动方式
 
 ```
 npm install
@@ -91,4 +91,92 @@ npm run dev
 
 （2）  使用cross-env设置环境变量
 
+## cookie
+
+1.每次发送http请求，会将请求域的cookie一起发送给server
+
+2.server可以修改cookie并返回给浏览器
+
+3.浏览器也可以通过js修改cookie(有限制)
+
+## server端nodejs操作cookie
+
+1.查看cookie
+
+2.修改cookie
+
+3.实现登录验证
+
+### 解析cookie(`app.js` 文件)
+
+```javascript
+// 解析cookie
+    req.cookie = {}
+    const cookieStr = req.headers.cookie || ''
+    cookieStr.split(';').forEach(item => {
+        if (!item) {
+            return
+        }
+    })
+```
+
+### 获取cookie(router\user.js)
+
+```javascript
+// 登录验证的测试
+    if (method === 'GET' && req.path === '/api/user/login-test') {
+        if (req.cookie.username) {
+            return Promise.resolve(new SuccessModel())
+        }
+        return Promise.resolve(new ErrorModel('尚未登录'))
+    }
+```
+
+### 操作cookie(router\user.js)
+
+```javascript
+// 操作cookie
+res.setHeader('Set-Cookie', `username=${data.username};path=/`)
+```
+
+登录成功之后，会在浏览器的cookie种下username。
+
+参考代码，
+
+```javascript
+if (method === 'GET' && req.path === '/api/user/login') {
+        // const { username, password } = req.body
+        const { username, password } = req.query
+        const result = login(username, password)
+        return result.then(data => {
+            if (data.username) {
+
+                // 操作cookie
+                res.setHeader('Set-Cookie', `username=${data.username};path=/`)
+                return new SuccessModel()
+            }
+            return new ErrorModel('登录失败')
+        })
+    }
+
+// 登录验证的测试
+    if (method === 'GET' && req.path === '/api/user/login-test') {
+        if (req.cookie.username) {
+            return Promise.resolve(new SuccessModel({
+                username: req.cookie.username
+            }))
+        }
+        return Promise.resolve(new ErrorModel('尚未登录'))
+    }
+```
+
+浏览器输入<http://localhost:8000/api/user/login?username=lisi&password=123> ，
+
+然后输入<http://localhost:8000/api/user/login-test>
+
+可以看到页面上显示
+
+```
+{"data":{"username":"lisi"},"errno":0}
+```
 
