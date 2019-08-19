@@ -180,3 +180,271 @@ if (method === 'GET' && req.path === '/api/user/login') {
 {"data":{"username":"lisi"},"errno":0}
 ```
 
+### cookie限制( `router/user.js` )
+
+1.`httpOnly` 限制前端对cookie进行修改
+
+```javascript
+res.setHeader('Set-Cookie', `username=${data.username};path=/;httpOnly`)
+```
+
+此处加上 `httpOnly`，限制前端的修改，不能再通过 `document.cookie` 修改cookie
+
+检验httpOnly的方法——
+
+login页面登录成功之后，<http://localhost:8000/api/user/login?username=lisi&password=123>
+
+进入login-test页面，输入`document.cookie`，打印出一个空白字符串`""`
+
+```javascript
+if (method === 'GET' && req.path === '/api/user/login') {
+        // const { username, password } = req.body
+        const { username, password } = req.query
+        const result = login(username, password)
+        return result.then(data => {
+            if (data.username) {
+
+                // 操作cookie
+                res.setHeader('Set-Cookie', `username=${data.username};path=/`)
+                return new SuccessModel()
+            }
+            return new ErrorModel('登录失败')
+        })
+    }
+
+if (method === 'GET' && req.path === '/api/user/login-test') {
+        if (req.cookie.username) {
+            return Promise.resolve(new SuccessModel({
+                username: req.cookie.username
+            }))
+        }
+        return Promise.resolve(new ErrorModel('尚未登录'))
+    }
+```
+
+2.设置cookie过期时间
+
+```javascript
+const getCookieExpires = () => {
+    const d = new Date()
+    d.setTime(d.getTime() + (24 * 60 * 60 * 1000))
+    return d.toGMTString()
+}
+
+const handleUserRouter = (req, res) => {
+    const method = req.method // GET POST
+
+    // 登录
+    if (method === 'GET' && req.path === '/api/user/login') {
+        res.setHeader('Set-Cookie', `username=${data.username};
+				path=/;httpOnly;expires=${getCookieExpires()}`)
+
+    }
+}
+```
+
+## session(`app.js`)
+
+问题——cookie存储username会泄露个人信息。
+
+解决——cookie存储userid，server端对应username，即server端存储用户信息。
+
+```javascript
+//session 数据
+const SESSION_DATA = {}
+
+const serverHandle = (req, res) => {
+  // 解析session
+    const userId = req.cookie.userId
+    if (userId) {
+        if (!SESSION_DATA[userId]) {
+            SESSION_DATA[userId] = {}
+        }
+
+    } else {
+        userId = `${Date.now()}_${Math.random()}`
+        SESSION_DATA[userId] = {}
+    }
+    req.session = SESSION_DATA[userId]
+}
+```
+
+代码逻辑解析：
+
+首先判断cookie中有没有userId
+
+1.cookie中有userId
+
+- 判断SESSION_DATA里面有没有userId对应的信息
+
+  没有的话，初始化一个空对象
+
+2.cookie中没有userId
+
+userId将被设为时间+随机数，并且在session中存入userId对应的空对象。
+
+## Redis
+
+### 上述使用session存在的问题：
+
+session是js变量，放在nodejs进程内存中
+
+1.进程内存有限，访问量过大，可能造成内存暴增
+
+2.正式线上运行是多进程，进程之间的内存无法共享
+
+3.上线的时候会覆盖原来的代码，重启服务器
+
+```javascript
+//session 数据
+const SESSION_DATA = {}
+```
+
+通过对象的方式保存`session` ，每次上线代码都会丢失。
+
+### Redis介绍
+
+web server 最常用的缓存数据库，数据放在内存中
+
+相比mysql，访问速度快(内存和硬盘不是一个数量级的)
+
+成本更高，可存储的数据量更小(内存的硬伤)
+
+### session为什么适合redis
+
+session访问频繁，对性能要求高
+
+session可不考虑断电丢失数据的问题(内存的硬伤)
+
+session数据量不会太大(相比mysql中存储的数据)
+
+### 用redis存储session
+
+1.完成nodejs连接redis的demo
+
+2.封装成工具函数，供API使用
+
+#### 1.创建redis demo(reids-test)
+
+```javascript
+const redis = require('redis')
+
+// 创建客户端
+const redisClient = redis.createClient(6379, '127.0.0.1')
+redisClient.on('error', err => {
+    console.error(err)
+})
+
+// 测试
+// redis.print可以查看设置是否成功
+// 成功的话，会返回Reply: OK
+redisClient.set('myname', 'sakura', redis.print)
+redisClient.get('myname', (err, val) => {
+    if (err) {
+        console.error(err)
+        return
+    }
+    console.log('val', val)
+})
+
+//退出
+redisClient.quit()
+```
+
+#### 2.连接redis ( `src\conf\db.js` & `src\db\redis.js`)
+
+```
+ // redis
+ REDIS_CONF = {
+     host: '127.0.0.1',
+     port: 6379
+}
+```
+
+#### `app.js`
+
+1.注释掉原来的session实现代码
+
+```javascript
+//session 数据
+const SESSION_DATA = {}
+
+// 解析session
+let userId = req.cookie.userId
+let needSetCookie = false
+if (userId) {
+        if (!SESSION_DATA[userId]) {
+            SESSION_DATA[userId] = {}
+        }
+
+} else {
+        needSetCookie = true
+        userId = `${Date.now()}_${Math.random()}`
+        SESSION_DATA[userId] = {}
+}
+req.session = SESSION_DATA[userId]
+```
+
+2.使用redis保存session数据
+
+```javascript
+	let userId = req.cookie.userId
+    let needSetCookie = false
+    if (!userId) {
+        needSetCookie = true
+        userId = `${Date.now()}_${Math.random()}`
+            // 初始化 redis 中的 session
+        set(userId, {})
+    }
+
+    // 获取session
+    req.sessionId = userId
+    get(req.sessionId).then(sessionData => {
+            if (sessionData === null) {
+                // 初始化 redis 中的 session
+                set(req.sessionId, {})
+                    // 设置session
+                req.session = {}
+            } else {
+                // 设置session
+                req.session = sessionData
+            }
+            console.log('req.session', req.session)
+
+            // 处理 post data
+            return getPostData(req)
+        }).then(postData => {})
+```
+
+#### `src\router\user.js`
+
+把数据库中获得的信息同步到redis中
+
+```javascript
+// 同步到redis
+set(req.sessionId, req.session)
+```
+
+具体操作如下
+
+```javascript
+if (method === 'GET' && req.path === '/api/user/login') {
+  return result.then(data => {
+            if (data.username) {
+
+                // 操作cookie
+                // res.setHeader('Set-Cookie', `username=${data.username};path=/;httpOnly;expires=${getCookieExpires()}`)
+
+                // 设置session
+                req.session.username = data.username
+                req.session.realname = data.realname
+
+                // 同步到redis
+                set(req.sessionId, req.session)
+
+                console.log('req.session is', req.session)
+                return new SuccessModel()
+            }
+}
+```
+

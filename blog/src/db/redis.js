@@ -19,16 +19,25 @@ function get(key) {
     // get 是一个异步操作，要通过promise进行封装
     const promise = new Promise((resolve, reject) => {
 
-        redisClient.get('myname', (err, val) => {
+        redisClient.get(key, (err, val) => {
             if (err) {
                 reject(err)
                 return
             }
-            resolve(val)
+            if (val == null) {
+                resolve(null)
+            }
+
+            try {
+                resolve(
+                    JSON.parse(val)
+                )
+            } catch (err) {
+                resolve(val)
+            }
         })
 
-        //退出
-        redisClient.quit()
+
 
     })
 
