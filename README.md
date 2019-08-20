@@ -318,6 +318,20 @@ session可不考虑断电丢失数据的问题(内存的硬伤)
 
 session数据量不会太大(相比mysql中存储的数据)
 
+### 启动 `redis`
+
+开一个cmd，进入redis文件夹输入
+
+```
+redis-server.exe redis.windows.conf
+```
+
+再开一个cmd，不要关掉原来的
+
+```
+redis-cli.exe -h 127.0.0.1 -p 6379
+```
+
 ### 用redis存储session
 
 1.完成nodejs连接redis的demo
