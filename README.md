@@ -338,7 +338,7 @@ redis-cli.exe -h 127.0.0.1 -p 6379
 
 2.封装成工具函数，供API使用
 
-#### 1.创建redis demo(reids-test)
+### 1.创建redis demo(reids-test)
 
 ```javascript
 const redis = require('redis')
@@ -365,7 +365,7 @@ redisClient.get('myname', (err, val) => {
 redisClient.quit()
 ```
 
-#### 2.连接redis ( `src\conf\db.js` & `src\db\redis.js`)
+### 2.连接redis ( `src\conf\db.js` & `src\db\redis.js`)
 
 ```
  // redis
@@ -462,3 +462,36 @@ if (method === 'GET' && req.path === '/api/user/login') {
 }
 ```
 
+### 3.校验是否登录
+
+```javascript
+ const loginCheck = (req) => {
+        if (!req.session.username) {
+            return Promise.resolve(
+                new ErrorModel('尚未登录')
+            )
+        }
+
+    }
+  // 新建一篇博客
+  if (method === 'POST' && req.path === '/api/blog/new') {
+
+        const loginCheckResult = loginCheck(req)
+
+        if (loginCheckResult) {
+            // 未登录
+            return loginCheck
+        }
+
+        req.body.author = req.session.username
+        const result = newBlog(req.body)
+        return result.then(data => {
+            return new SuccessModel(data)
+        })
+
+    }
+```
+
+## Nginx配置
+
+用于让前端调取后台接口。
