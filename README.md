@@ -494,4 +494,51 @@ if (method === 'GET' && req.path === '/api/user/login') {
 
 ## Nginx配置
 
-用于让前端调取后台接口。
+涉及到cookie，没办法用postman联调，配置nginx用于让前端调取后台接口。
+
+### 和前端联调
+
+1.登录功能依赖cookie，必须用浏览器来联调
+
+2.cookie跨域不共享的，前端server端必须同域
+
+3.需要用nginx做代理，让前后端同域
+
+### 1.下载插件
+
+前端目录(http-server)
+
+```
+cnpm install http-server -g
+http-server -p 8001
+```
+
+### 2.配置nginx( `conf\nginx.conf` )
+
+```
+worker_processes  2;#开启双核
+
+location / {
+	proxy_pass http://localhost:8001;
+}
+		
+location /api/ {
+	proxy_pass http://localhost:8000;
+}
+```
+
+测试配置文件
+
+```
+./nginx -t
+```
+
+启动nginx
+
+```
+./nginx.exe
+```
+
+浏览器输入——`<http://localhost:8080/index.html>`
+
+成功进入博客首页，访问list接口成功。
