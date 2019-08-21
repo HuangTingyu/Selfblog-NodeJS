@@ -30,9 +30,17 @@ npm run dev
 
 ## 浏览器打开(nginx反向代理)
 
-博客首页
+- 博客首页
 
 http://localhost:8080/index.html
+
+- 管理后台
+
+<http://localhost:8080/admin.html>
+
+- 登录页面
+
+<http://localhost:8080/login.html>
 
 ## `nodejs`接口列表
 
