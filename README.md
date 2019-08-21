@@ -28,7 +28,13 @@ npm run dev
 
 密码 —— 123
 
-## 接口列表
+## 浏览器打开(nginx反向代理)
+
+博客首页
+
+http://localhost:8080/index.html
+
+## `nodejs`接口列表
 
 - <http://localhost:8000/api/blog/list> 博客列表
 - http://localhost:8000/api/blog/detail 博客详情
