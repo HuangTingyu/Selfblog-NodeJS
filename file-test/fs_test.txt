@@ -1,0 +1,22 @@
+commit d0cfa91989386656c541975894f7a80c81dca87f (HEAD -> master, origin/master, origin/HEAD)
+Author: HTY <1581332872@163.com>
+Date:   Fri Aug 23 20:55:07 2019 +0800
+
+    append GPL
+
+commit 9f5acb2630360dcd79aae97fb04ea9a8e3a992d0
+Author: HTY <1581332872@163.com>
+Date:   Fri Aug 23 20:54:08 2019 +0800
+
+    add distributed
+
+commit 051d42c10143ac3acc4cae45d3619eee682c5fd4
+Author: HTY <1581332872@163.com>
+Date:   Fri Aug 23 20:52:56 2019 +0800
+
+    wrote a readme file
+
+commit 85189a42dbc40343cb7dcdeca8ff14d17e10a95f
+Author: HTY <1581332872@163.com>
+Date:   Wed Aug 21 17:09:21 2019 +0800
+新写入的内容 2019-08-29

@@ -28,6 +28,30 @@ npm run dev
 
 密码 —— 123
 
+### vscode 智能提醒 nodejs
+
+```
+cnpm install typings -g
+```
+
+安装好之后，typings提示版本号
+
+```
+typings --version
+```
+
+进入项目根目录
+
+```
+typings init
+```
+
+产生 `typings.json` 文件之后，
+
+```
+typings install dt~node --global--save
+```
+
 ## 浏览器打开(nginx反向代理)
 
 - 博客首页
@@ -556,3 +580,27 @@ location /api/ {
 浏览器输入——`<http://localhost:8080/index.html>`
 
 成功进入博客首页，访问list接口成功。
+
+## 日志管理
+
+1.nodejs文件操作，nodejs stream
+
+2.日志功能开发和使用
+
+3.日志文件拆分，日志内容分析
+
+### demo初步
+
+存在缺陷——只能处理小的文本文件
+
+详见 `fs_test` 目录下的 `fs_test.js`
+
+### IO操作性能瓶颈
+
+- IO包括 '网络IO' 和 '文件IO'
+- IO最大的特点——慢
+
+### stream
+
+详细代码见 `stream-test` 目录
+
