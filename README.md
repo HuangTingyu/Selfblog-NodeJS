@@ -604,3 +604,50 @@ location /api/ {
 
 详细代码见 `stream-test` 目录
 
+实时输出，我们键入的内容
+
+`stdin` 表示输入的内容，通过pipe，流到 `stdout`，也就是把输入的内容打印出来。
+
+demo1——
+
+```js
+process.stdin.pipe(process.stdout)
+```
+
+demo2——
+
+可以把 `req` 和 `res`看作两个水桶，通过pipe这个管道连接起来。
+
+```js
+const http = require('http')
+const server = http.createServer((req, res) => {
+    if (req.method === 'POST') {
+        // 输入流到输出
+        req.pipe(res)
+    }
+})
+server.listen(8000)
+```
+
+postman发送一个json格式的数据到 `http://localhost:8000/`，返回相同的数据。
+
+demo3——
+
+客户端往server端传递数据
+
+```js
+ let postData = ''
+
+// 客户端往server端传递数据
+req.on('data', chunk => {
+    postData += chunk.toString()
+})
+
+req.on('end', () => {
+    if (!postData) {
+     resolve({})
+    }
+    resolve(JSON.parse(postData))
+})
+```
+

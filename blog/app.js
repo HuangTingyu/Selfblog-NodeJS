@@ -24,6 +24,8 @@ const getPostData = (req) => {
             return
         }
         let postData = ''
+
+        // 客户端往server端传递数据
         req.on('data', chunk => {
             postData += chunk.toString()
         })
