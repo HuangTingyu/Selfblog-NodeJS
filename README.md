@@ -11,10 +11,52 @@ blog演示了博客后端接口的编写。
 
 ## blog启动方式
 
+1.启动redis
+
+开一个cmd，进入redis文件夹输入
+
+```
+redis-server.exe redis.windows.conf
+```
+
+再开一个cmd，不要关掉原来的
+
+```
+redis-cli.exe -h 127.0.0.1 -p 6379
+```
+
+2.启动nginx
+
+```
+./nginx.exe
+```
+
+3.启动项目
+
 ```
 npm install
 npm run dev
 ```
+
+4.启动前端(html-test目录)
+
+```
+http-server -p 8001
+```
+
+## 浏览器打开(nginx反向代理)
+
+- 博客首页
+
+http://localhost:8080/index.html
+
+- 管理后台
+
+<http://localhost:8080/admin.html>
+
+- 登录页面
+
+<http://localhost:8080/login.html>
 
 ### 端口号(bin\www.js文件)
 
@@ -51,20 +93,6 @@ typings init
 ```
 typings install dt~node --global--save
 ```
-
-## 浏览器打开(nginx反向代理)
-
-- 博客首页
-
-http://localhost:8080/index.html
-
-- 管理后台
-
-<http://localhost:8080/admin.html>
-
-- 登录页面
-
-<http://localhost:8080/login.html>
 
 ## `nodejs`接口列表
 
@@ -650,4 +678,36 @@ req.on('end', () => {
     resolve(JSON.parse(postData))
 })
 ```
+
+demo4——
+
+把文件 `bacra.txt` 里面的内容，复制到 `doom.txt`里面，详细代码见 `stream-test\stream_log.js`
+
+### 应用
+
+#### 1.产生日志
+
+日志地址 —— blog/logs
+
+代码逻辑—— src/utils/log.js + app.js
+
+`app.js`
+
+```js
+const serverHandle = (req, res) => {
+    // 记录access log
+    access(`${req.method} —— ${req.url} —— ${req.headers['user-agent']} —— ${Date.now()}`)
+```
+
+#### 2.分析日志
+
+demo——分析日志中，chrome浏览器的占比，详见 `src\utils\readline.js` 文件。
+
+1.sql注入——窃取数据库内容
+
+2.XSS攻击——窃取前端的cookie内容
+
+3.密码加密
+
+
 
