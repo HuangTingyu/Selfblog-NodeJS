@@ -21,6 +21,14 @@ npm install nodemon cross-env -D
 "dev" : "cross-env NODE_ENV=dev nodemon ./bin/www"
 ```
 
+环境处理 `app.js` 
+
+开发环境下，就抛出error，非开发环境不把信息爆给用户。
+
+```
+res.locals.error = req.app.get('env') === 'dev' ? err : {}
+```
+
 ## 实现对比
 
 ### cookie
