@@ -19,8 +19,14 @@ const link = 'http://qiandongnan.offcn.com/html/2021/01/26429.html'
 
 let testLink = 'http://gaotu05.com/9tMyjMJ_QoZgTJ'
 http.get(testLink, (res) => {
+    let error
     if (res.statusCode === 302) {
-        console.log('close')
+        error = new Error('请求失败')
+    }
+    if (error) {
+        console.error(error)
         return
     }
+}).on('error', (e) => {
+    console.error(e)
 })
