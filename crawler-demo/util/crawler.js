@@ -1,38 +1,15 @@
 const fs = require('fs')
-const https = require('https')
-const http = require('http')
 const puppeteer = require('puppeteer')
 
-const link = 'http://qiandongnan.offcn.com/html/2021/01/26429.html'
+let allLink = []
+let count = 0
 
+fs.readFile(('../assets/httpLink.json'), 'utf8', (err, rawData) => {
+    allLink = JSON.parse(rawData)
+})
+const allLinkLength = allLink.length
 
-// fs.readFile('../raw/rawLink.txt', 'utf-8', (err, data) => {
-//     let rawArr = data.split(/(\n)/)
-//     console.log(rawArr.length)
-//     rawArr.forEach((rawLink, index) => {
-//         let link = rawLink.replace(/\s*/g, '')
-//         if (index < 20 && link) {
-//             console.log(link)
-//         }
-//     })
-// })
-
-
-// let testLink = 'http://gaotu05.com/9tMyjMJ_QoZgTJ'
-// http.get(testLink, (res) => {
-//     let error
-//     if (res.statusCode === 302) {
-//         error = new Error('请求失败')
-//     }
-//     if (error) {
-//         console.error(error)
-//         return
-//     }
-// }).on('error', (e) => {
-//     console.error(e)
-// })
-//启动浏览器
-async function getLink(){
+async function crawlering(link){
     const browers = await puppeteer.launch()
     //启动新页面
     const page = await browers.newPage()
@@ -75,11 +52,18 @@ async function getLink(){
     linkArr.push(links)
 
     
-    fs.writeFile("../assets/writeCsv.csv", linkArr.join(','), (err) => {
+    fs.appendFile("../assets/writeCsv.csv", linkArr.join(','), (err) => {
         console.log(err || "done")
     })
     await browers.close()
     return
 }
 
-getLink()
+
+async function Crawler() {
+    let crawlerLink = allLink[count]
+    fs.appendFile("../assets/writeCsv.csv", '\n', (err) => {
+        console.log(err || "done")
+    })
+
+}
