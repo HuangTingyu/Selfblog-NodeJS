@@ -88,7 +88,7 @@ function getTime() {
 }
 
 function log(crawlerLink) {
-    let log = getTime() +  '——count——' + count + '——crawlerLink——' + crawlerLink
+    let log = getTime() +  '——count——' + count + '——crawlerLink——' + crawlerLink+ '\n'
     fs.appendFileSync('../assets/crawlerLog.txt', log, (err) => {
         console.log(err)
     })
